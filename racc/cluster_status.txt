@@ -1,0 +1,5 @@
+[{nodes,[{disc,['rabbit@rabbitmq-01','rabbit@rabbitmq-02',
+                'rabbit@rabbitmq-03']}]},
+ {running_nodes,['rabbit@rabbitmq-02','rabbit@rabbitmq-03',
+                 'rabbit@rabbitmq-01']},
+ {partitions,[]}]

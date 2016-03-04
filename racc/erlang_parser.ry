@@ -1,0 +1,52 @@
+class ErlangParser
+rule
+  statement : list
+            | tuple
+
+  list      : LIST_BEGIN elements LIST_END   { result = val[1] }
+            | LIST_BEGIN LIST_END            { result = [] }
+
+  tuple     : TUPLE_BEGIN elements TUPLE_END { result = val[1] }
+            | TUPLE_BEGIN TUPLE_END          { result = [] }
+
+  elements  : element                        { result = [val[0]] }
+            | elements COMMA element         { result << val[2]  }
+
+  element   : list
+            | tuple
+            | ATOM                           { result = val[0].to_sym }
+            | STRING                         { result = val[0] }
+            | INTEGER                        { result = val[0].to_i }
+            | FLOAT                          { result = val[0].to_f }
+end
+
+---- header
+require "strscan"
+
+---- inner
+
+def parse(str)
+  ss = StringScanner.new(str)
+  @tokens = []
+
+  until ss.eos?
+    ss.scan(/"(.+)"/)       ? @tokens << [:STRING,      ss[1]] :
+    ss.scan(/\d+\.\d+/)     ? @tokens << [:FLOAT,       ss.matched] :
+    ss.scan(/\d+/)          ? @tokens << [:INTEGER,     ss.matched] :
+    ss.scan(/\[/)           ? @tokens << [:LIST_BEGIN,  ss.matched] :
+    ss.scan(/\]/)           ? @tokens << [:LIST_END,    ss.matched] :
+    ss.scan(/{/)            ? @tokens << [:TUPLE_BEGIN, ss.matched] :
+    ss.scan(/}/)            ? @tokens << [:TUPLE_END,   ss.matched] :
+    ss.scan(/'([-\w_@]+)'/) ? @tokens << [:ATOM,        ss[1]] :
+    ss.scan(/[a-z][\w_@]+/) ? @tokens << [:ATOM,        ss.matched] :
+    ss.scan(/,/)            ? @tokens << [:COMMA,       ss.matched] :
+    ss.scan(/\s/)           ? nil :
+    (raise "scanner error")
+  end
+
+  do_parse
+end
+
+def next_token
+  @tokens.shift
+end
