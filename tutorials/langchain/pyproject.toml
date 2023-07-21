@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "langchain-tutorial"
+version = "0.1.0"
+description = ""
+authors = ["nownabe <nownabe@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "langchain_tutorial"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain = "^0.0.166"
+openai = "^0.27.6"
+google-search-results = "^2.4.2"
+google-cloud-bigquery = "^3.10.0"
+chromadb = "^0.3.22"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

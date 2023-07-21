@@ -1,0 +1,11 @@
+version: v1
+name: buf.build/nownabe/petapis
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/nownabe/paymentapis
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT

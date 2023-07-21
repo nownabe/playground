@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package payment.v1alpha1;
+
+/* option go_package = */
+/* "github.com/bufbuild/buf-tour/petstore/gen/proto/go/payment/v1alpha1;paymentv1alpha1"; */
+
+import "google/type/money.proto";
+
+enum PaymentProvider {
+  PAYMENT_PROVIDER_UNSPECIFIED = 0;
+  PAYMENT_PROVIDER_STRIPE = 1;
+  PAYMENT_PROVIDER_PAYPAL = 2;
+  PAYMENT_PROVIDER_APPLE = 3;
+}
+
+message Order {
+  string order_id = 1;
+  string recipient_id = 2;
+  google.type.Money amount = 3;
+  PaymentProvider payment_provider = 4;
+}
