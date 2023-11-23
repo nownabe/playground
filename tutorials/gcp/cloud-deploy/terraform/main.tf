@@ -72,3 +72,30 @@ resource "google_project_iam_member" "logWriter" {
 resource "google_service_account" "hello-app-deploy" {
   account_id = "hello-app-deploy"
 }
+
+resource "google_clouddeploy_delivery_pipeline" "hello-app" {
+  location    = var.region
+  name        = "hello-app"
+  description = "Delivery pipeline for hello-app"
+
+  serial_pipeline {
+    stages {
+      target_id = google_clouddeploy_target.hello-app-dev.name
+      profiles  = ["dev"]
+    }
+  }
+}
+
+resource "google_clouddeploy_target" "hello-app-dev" {
+  location         = var.region
+  name             = "hello-app-dev"
+  description      = "dev environment for hello-app"
+  require_approval = false
+  run {
+    location = "projects/${data.google_project.project.project_id}/locations/${var.region}"
+  }
+  execution_configs {
+    usages          = ["RENDER", "DEPLOY"]
+    service_account = google_service_account.hello-app-deploy.email
+  }
+}
