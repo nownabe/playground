@@ -37,8 +37,8 @@ resource "google_project_service" "cloudbuild" {
   service = each.key
 }
 
-resource "google_artifact_registry_repository" "app" {
-  repository_id = "app"
+resource "google_artifact_registry_repository" "hello-app" {
+  repository_id = "hello-app"
   location      = var.region
   format        = "DOCKER"
 }
@@ -53,10 +53,10 @@ locals {
   }
 }
 
-resource "google_service_account" "app" {
+resource "google_service_account" "hello-app" {
   for_each = local.envs_map
 
-  account_id = "app-${each.key}"
+  account_id = "hello-app-${each.key}"
 }
 
 resource "google_project_iam_member" "logWriter" {
@@ -64,11 +64,11 @@ resource "google_project_iam_member" "logWriter" {
 
   project = data.google_project.project.project_id
   role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${google_service_account.app[each.key].email}"
+  member  = "serviceAccount:${google_service_account.hello-app[each.key].email}"
 }
 
 // Cloud Deploy
 
-resource "google_service_account" "app-deploy" {
-  account_id = "app-deploy"
+resource "google_service_account" "hello-app-deploy" {
+  account_id = "hello-app-deploy"
 }
