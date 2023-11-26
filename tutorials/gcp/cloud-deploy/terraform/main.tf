@@ -61,6 +61,14 @@ resource "google_service_account" "hello-app" {
   account_id = "hello-app-${each.key}"
 }
 
+resource "google_service_account_iam_member" "hello-app-serviceAccountUser" {
+  for_each = local.envs_map
+
+  service_account_id = google_service_account.hello-app[each.key].name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.hello-app-deploy.email}"
+}
+
 resource "google_project_iam_member" "logWriter" {
   for_each = local.envs_map
 
@@ -69,10 +77,50 @@ resource "google_project_iam_member" "logWriter" {
   member  = "serviceAccount:${google_service_account.hello-app[each.key].email}"
 }
 
+resource "google_cloud_run_v2_service" "hello-app" {
+  for_each = local.envs_map
+
+  location = var.region
+  name     = "hello-app-${each.key}"
+  ingress  = "INGRESS_TRAFFIC_ALL"
+
+  template {
+    containers {
+      image = "us-docker.pkg.dev/cloudrun/container/hello"
+    }
+    service_account = google_service_account.hello-app[each.key].email
+  }
+}
+
+resource "google_cloud_run_v2_service_iam_member" "hello-app-developer" {
+  for_each = local.envs_map
+
+  location = var.region
+  name     = google_cloud_run_v2_service.hello-app[each.key].name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.hello-app-deploy.email}"
+}
+
 // Cloud Deploy
 
 resource "google_service_account" "hello-app-deploy" {
   account_id = "hello-app-deploy"
+}
+
+resource "google_project_iam_member" "deploy_logWriter" {
+  project = data.google_project.project.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.hello-app-deploy.email}"
+}
+
+data "google_storage_bucket" "hello-app-artifact-storage" {
+  name = "${var.region}.deploy-artifacts.${data.google_project.project.project_id}.appspot.com"
+}
+
+resource "google_storage_bucket_iam_member" "hello-app-artifact-storage" {
+  bucket = data.google_storage_bucket.hello-app-artifact-storage.name
+  role   = "roles/storage.objectUser"
+  member = "serviceAccount:${google_service_account.hello-app-deploy.email}"
 }
 
 resource "google_clouddeploy_delivery_pipeline" "hello-app" {
