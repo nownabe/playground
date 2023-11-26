@@ -90,6 +90,12 @@ resource "google_cloud_run_v2_service" "hello-app" {
     }
     service_account = google_service_account.hello-app[each.key].email
   }
+
+  lifecycle {
+    ignore_changes = [
+      template
+    ]
+  }
 }
 
 resource "google_cloud_run_v2_service_iam_member" "hello-app-developer" {
@@ -99,6 +105,15 @@ resource "google_cloud_run_v2_service_iam_member" "hello-app-developer" {
   name     = google_cloud_run_v2_service.hello-app[each.key].name
   role     = "roles/run.developer"
   member   = "serviceAccount:${google_service_account.hello-app-deploy.email}"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "hello-app-invoker" {
+  for_each = local.envs_map
+
+  location = var.region
+  name     = google_cloud_run_v2_service.hello-app[each.key].name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
 
 // Cloud Deploy
@@ -146,6 +161,26 @@ resource "google_clouddeploy_delivery_pipeline" "hello-app" {
   }
 }
 
+locals {
+  deploy_parameters = {
+    dev = {
+      service_name    = google_cloud_run_v2_service.hello-app["dev"].name
+      service_account = google_service_account.hello-app["dev"].email
+      name            = "DEV"
+    }
+    stg = {
+      service_name    = google_cloud_run_v2_service.hello-app["stg"].name
+      service_account = google_service_account.hello-app["stg"].email
+      name            = "STG"
+    }
+    prd = {
+      service_name    = google_cloud_run_v2_service.hello-app["prd"].name
+      service_account = google_service_account.hello-app["prd"].email
+      name            = "PRD"
+    }
+  }
+}
+
 resource "google_clouddeploy_target" "hello-app-dev" {
   location         = var.region
   name             = "hello-app-dev"
@@ -158,6 +193,8 @@ resource "google_clouddeploy_target" "hello-app-dev" {
     usages          = ["RENDER", "DEPLOY"]
     service_account = google_service_account.hello-app-deploy.email
   }
+
+  deploy_parameters = local.deploy_parameters["dev"]
 }
 
 resource "google_clouddeploy_target" "hello-app-stg" {
@@ -172,6 +209,7 @@ resource "google_clouddeploy_target" "hello-app-stg" {
     usages          = ["RENDER", "DEPLOY"]
     service_account = google_service_account.hello-app-deploy.email
   }
+  deploy_parameters = local.deploy_parameters["stg"]
 }
 
 resource "google_clouddeploy_target" "hello-app-prd" {
@@ -186,4 +224,5 @@ resource "google_clouddeploy_target" "hello-app-prd" {
     usages          = ["RENDER", "DEPLOY"]
     service_account = google_service_account.hello-app-deploy.email
   }
+  deploy_parameters = local.deploy_parameters["prd"]
 }

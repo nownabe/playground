@@ -10,16 +10,10 @@ build:
     projectId: concise-faculty-406010
 deploy:
   cloudrun: {}
+manifests:
+  rawYaml:
+    - service.yaml
 profiles:
   - name: dev
-    manifests:
-      rawYaml:
-        - service-dev.yaml
   - name: stg
-    manifests:
-      rawYaml:
-        - service-stg.yaml
   - name: prd
-    manifests:
-      rawYaml:
-        - service-prd.yaml
