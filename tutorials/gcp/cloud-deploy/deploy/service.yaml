@@ -1,0 +1,17 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-app-dev # from-param: ${service_name}
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "1"
+    spec:
+      serviceAccountName: hello-app-dev@concise-faculty-406010.iam.gserviceaccount.com # from-param: ${service_account}
+      containers:
+        - name: hello-app
+          image: hello-app
+          env:
+            - name: NAME
+              value: "dev" # from-param: ${name}
