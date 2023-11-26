@@ -1,0 +1,25 @@
+apiVersion: skaffold/v3
+kind: Config
+metadata:
+  name: hello-app
+build:
+  artifacts:
+    - image: hello-app
+      context: .
+  googleCloudBuild:
+    projectId: concise-faculty-406010
+deploy:
+  cloudrun: {}
+profiles:
+  - name: dev
+    manifests:
+      rawYaml:
+        - service-dev.yaml
+  - name: stg
+    manifests:
+      rawYaml:
+        - service-stg.yaml
+  - name: prd
+    manifests:
+      rawYaml:
+        - service-prd.yaml
