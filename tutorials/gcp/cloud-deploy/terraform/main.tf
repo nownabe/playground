@@ -17,12 +17,14 @@ data "google_project" "project" {
 
 locals {
   enabled_services = [
+    "artifactregistry.googleapis.com",
     "cloudbuild.googleapis.com",
     "clouddeploy.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "compute.googleapis.com",
     "iam.googleapis.com",
     "run.googleapis.com",
+    "storage.googleapis.com",
   ]
 
   enabled_services_map = {
@@ -83,6 +85,16 @@ resource "google_clouddeploy_delivery_pipeline" "hello-app" {
       target_id = google_clouddeploy_target.hello-app-dev.name
       profiles  = ["dev"]
     }
+
+    stages {
+      target_id = google_clouddeploy_target.hello-app-stg.name
+      profiles  = ["stg"]
+    }
+
+    stages {
+      target_id = google_clouddeploy_target.hello-app-prd.name
+      profiles  = ["prd"]
+    }
   }
 }
 
@@ -91,6 +103,34 @@ resource "google_clouddeploy_target" "hello-app-dev" {
   name             = "hello-app-dev"
   description      = "dev environment for hello-app"
   require_approval = false
+  run {
+    location = "projects/${data.google_project.project.project_id}/locations/${var.region}"
+  }
+  execution_configs {
+    usages          = ["RENDER", "DEPLOY"]
+    service_account = google_service_account.hello-app-deploy.email
+  }
+}
+
+resource "google_clouddeploy_target" "hello-app-stg" {
+  location         = var.region
+  name             = "hello-app-stg"
+  description      = "stg environment for hello-app"
+  require_approval = true
+  run {
+    location = "projects/${data.google_project.project.project_id}/locations/${var.region}"
+  }
+  execution_configs {
+    usages          = ["RENDER", "DEPLOY"]
+    service_account = google_service_account.hello-app-deploy.email
+  }
+}
+
+resource "google_clouddeploy_target" "hello-app-prd" {
+  location         = var.region
+  name             = "hello-app-prd"
+  description      = "prd environment for hello-app"
+  require_approval = true
   run {
     location = "projects/${data.google_project.project.project_id}/locations/${var.region}"
   }
