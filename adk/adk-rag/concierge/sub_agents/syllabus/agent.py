@@ -13,7 +13,7 @@ syllabus_retrieval_tool = VertexAiRagRetrieval(
     rag_resources=[rag.RagResource(rag_corpus=RAG_CORPUS_ID)],
 )
 
-syllabus_agent = Agent(
+root_agent = Agent(
     model="gemini-2.5-flash",
     name="SyllabusAgent",
     description="大学のシラバスに関する質問に答えるエージェント",

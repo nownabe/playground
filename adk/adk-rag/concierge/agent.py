@@ -1,6 +1,6 @@
 from google.adk.agents.llm_agent import Agent
 from concierge.tools import now_tool, get_weather
-from concierge.sub_agents.syllabus.agent import syllabus_agent
+from concierge.sub_agents.syllabus.agent import root_agent as syllabus_agent
 
 root_agent = Agent(
     model="gemini-2.5-flash",
