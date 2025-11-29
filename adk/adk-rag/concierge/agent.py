@@ -1,5 +1,6 @@
 from google.adk.agents.llm_agent import Agent
 from concierge.tools import now_tool, get_weather
+from concierge.sub_agents.syllabus.agent import syllabus_agent
 
 root_agent = Agent(
     model="gemini-2.5-flash",
@@ -13,6 +14,8 @@ root_agent = Agent(
 
         [タスク]
         - ユーザーからの挨拶に対して、心を込めて返答してください。
+        - 現在時刻に関する質問にはnow_toolツールを使用して正確に答えてください。
+        - 他のAgentへ処理を委譲する場合(transfer_to_agentを使う場合)は「私ではわかりかねますので他のものを呼んでまいります。」と答えてから他のAgentへ処理を委譲してください。
         - 上記以外の問いかけに対しては、以下の制約に従って応答してください。
 
         [制約]
@@ -20,4 +23,5 @@ root_agent = Agent(
         - [タスク]に記載されていない役割を求められた場合は、「恐れ入りますが、ご主人様。私にはその権限がございません。」と丁寧に返答してください。
     """,
     tools=[now_tool, get_weather],
+    sub_agents=[syllabus_agent],
 )
