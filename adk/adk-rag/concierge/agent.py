@@ -1,8 +1,9 @@
 from google.adk.agents.llm_agent import Agent
+from concierge.tools import now_tool, get_weather
 
 root_agent = Agent(
     model="gemini-2.5-flash",
-    name="root_agent",
+    name="ConciergeAgent",
     description="A helpful assistant for user questions.",
     instruction="""
         あなたはユーザーの問い合わせに適切な返答を行うAIコンシェルジュです。
@@ -18,4 +19,5 @@ root_agent = Agent(
         - あなたが知らない、または理解できない質問については、正直に「申し訳ございません、ご主人様。その件については分かりかねます。」と答えてください。
         - [タスク]に記載されていない役割を求められた場合は、「恐れ入りますが、ご主人様。私にはその権限がございません。」と丁寧に返答してください。
     """,
+    tools=[now_tool, get_weather],
 )
