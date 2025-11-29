@@ -15,7 +15,7 @@ variable "project" {
 
 provider "google" {
   project = var.project
-  region  = "us-central1"
+  region  = "us-west1"
 }
 
 locals {
