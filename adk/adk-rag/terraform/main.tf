@@ -31,3 +31,9 @@ resource "google_project_service" "services" {
 
   service = "${each.value}.googleapis.com"
 }
+
+resource "google_vertex_ai_rag_engine_config" "default" {
+  rag_managed_db_config {
+    basic {}
+  }
+}
