@@ -1,0 +1,3 @@
+[tools]
+gcloud = "548.0.0"
+terraform = "1.14.0"
