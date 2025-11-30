@@ -1,1 +1,8 @@
+.envrc
+
+# Python
 __pycache__
+
+# Terraform
+.terraform/
+terraform.tfstate*
