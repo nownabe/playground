@@ -37,3 +37,11 @@ resource "google_vertex_ai_rag_engine_config" "default" {
     basic {}
   }
 }
+
+resource "google_storage_bucket" "staging" {
+  name                        = "${var.project}-staging"
+  location                    = "US-WEST1"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+}
