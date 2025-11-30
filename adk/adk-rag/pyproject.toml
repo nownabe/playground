@@ -3,7 +3,5 @@ name = "adk-rag"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = [
-    "google-adk>=1.19.0",
-]
+requires-python = ">=3.13"
+dependencies = ["google-adk>=1.19.0"]
